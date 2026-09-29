@@ -4,11 +4,11 @@ A once-a-day shared sunset. One question, one answer per person, floating into a
 
 - `index.html` — the whole front end (no build step, no framework).
 - `netlify/functions/` — the backend: three small serverless functions talking to a Postgres database.
-- `schema.sql` — the two tables the app needs.
+- `netlify/database/migrations/001_create_responses.sql` — the two tables the app needs.
 
 ## Deploy on Netlify
 
-1. **Database.** In the Netlify dashboard, open this site → **Data & storage → Database** and provision **Netlify DB** if you haven't (you already have one). Open its **SQL console** and run everything in `schema.sql` once, to create the `responses` and `reactions` tables.
+1. **Database.** In the Netlify dashboard, open this site → **Data & storage → Database** and provision **Netlify DB** if you haven't (you already have one). Open its **SQL console** and run everything in `netlify/database/migrations/001_create_responses.sql` once, to create the `responses` and `reactions` tables.
 2. **Env vars.** Netlify DB sets `NETLIFY_DATABASE_URL` for you automatically. Add one more, in **Site configuration → Environment variables**:
    - `ADMIN_TOKEN` — any password you choose, used to unlock `#admin`.
 3. **Deploy.** Push this repo to GitHub and connect it in Netlify (or drag-and-drop the folder in the Netlify UI). Netlify reads `netlify.toml`, installs `@neondatabase/serverless` from `package.json`, and publishes `index.html` plus the three functions under `/.netlify/functions/*` (mapped to `/api/*`).
@@ -24,10 +24,10 @@ That's it — no separate server to run.
 ## If responses aren't saving or don't show up for other people
 Visit `/api/health` on your live site. It checks the database connection and whether
 the `responses`/`reactions` tables exist **on the branch your production site is actually
-reading from**. A common cause: running `schema.sql` in a *preview/agent* database branch
+reading from**. A common cause: running the migration in a *preview/agent* database branch
 (Netlify sometimes creates one, e.g. `agent-6ab...`) instead of the `production` branch —
 the SQL console shows a banner when you're on an isolated branch and warns that changes
-there won't affect your live site. Make sure you're on `production` before running `schema.sql`,
+there won't affect your live site. Make sure you’re on `production` before running that migration,
 and that `NETLIFY_DATABASE_URL` in your deployed environment points at that same branch
 (Data & storage → Database → production).
 
