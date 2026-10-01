@@ -1,6 +1,11 @@
 const { neon } = require('@neondatabase/serverless');
-const conn = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL;
-if (!conn) throw new Error('NETLIFY_DATABASE_URL is not set');
+const conn =
+  process.env.NETLIFY_DB_URL ||
+  process.env.NETLIFY_DATABASE_URL ||
+  process.env.DATABASE_URL;
+
+if (!conn) throw new Error('Database connection URL is not set');
+
 const sql = neon(conn);
 const headers = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 function json(statusCode, body) { return { statusCode, headers, body: JSON.stringify(body) }; }
